@@ -30,12 +30,14 @@ https://maven.apache.org/install.html
 git clone https://github.com/yukitteru/temnet_parser.git
 cd temnet_parser-master/
 mvn install
+./mvnw spring-boot:run
 ```
 или
 ```
 https://github.com/yukitteru/temnet_parser/archive/refs/heads/master.zip
 cd your/archive/save/location/temnet_parser-master
 mvn install
+./mvnw spring-boot:run
 ```
 
 ## Дополнительно:
