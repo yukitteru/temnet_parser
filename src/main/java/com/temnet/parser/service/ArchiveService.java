@@ -52,6 +52,7 @@ public class ArchiveService {
     }
 
     public Page<Report> getOrgData(String username, Timestamp from, Timestamp to, Status status, @PageableDefault(size = 15) Pageable pageable) {
+        pageable = Pageable.unpaged();
         String statusString = getStatusString(status);
         Page<Archive> find = repo.findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
                 username,
@@ -64,6 +65,7 @@ public class ArchiveService {
     }
 
     public Page<Report> getAllData( Timestamp from, Timestamp to, Status status, @PageableDefault(size = 15) Pageable pageable) {
+        pageable = Pageable.unpaged();
         String statusString = getStatusString(status);
         Page<Archive> find = repo.findAllByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
                 from,
