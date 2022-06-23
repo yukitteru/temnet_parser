@@ -105,7 +105,7 @@ let form = {
                             autowidth: true,
                             autoheight: true,
                             editable: false,
-                            datafetch: 1000000,
+                            datafetch: 100,
                             pager: 'organizationPager'
                         },
                         {
