@@ -4,6 +4,7 @@ import com.temnet.parser.domain.Archive;
 import com.temnet.parser.domain.Report;
 import com.temnet.parser.domain.Status;
 import com.temnet.parser.repo.ArchiveRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

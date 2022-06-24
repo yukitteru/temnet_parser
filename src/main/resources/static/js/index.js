@@ -37,9 +37,7 @@ require(
                 rows: [
                     {
                         view: 'toolbar',
-                        cols: [
-
-                        ]
+                        cols: []
                     },
                     {
                         id: 'root'
