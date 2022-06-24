@@ -34,7 +34,7 @@ mvn install
 ```
 или
 ```
-https://github.com/yukitteru/temnet_parser/archive/refs/heads/master.zip
+wget https://github.com/yukitteru/temnet_parser/archive/refs/heads/master.zip
 cd your/archive/save/location/temnet_parser-master
 mvn install
 ./mvnw spring-boot:run
