@@ -111,8 +111,8 @@ let form = {
                         {
                             view: "pager",
                             id: 'organizationPager',
-                            size: 10,
-                            group: 10,
+                            size: 5,
+                            group: 5,
                             template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
                         }
                     ]
