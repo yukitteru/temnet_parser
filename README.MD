@@ -26,20 +26,21 @@ https://maven.apache.org/install.html
 
 
 ## Запуск:
+### Скачать:
 ```shell
 git clone https://github.com/yukitteru/temnet_parser.git
-cd temnet_parser-master
-mvn install
-./mvnw spring-boot:run
+cd temnet_parser
 ```
 или
 ```
 wget https://github.com/yukitteru/temnet_parser/archive/refs/heads/master.zip
 cd your/unzip/archive/save/location/temnet_parser-master
+```
+### Запустить:
+```
 mvn install
 ./mvnw spring-boot:run
 ```
-
 Ресурс доступен по адресу:
 ```
 http://localhost:8080/
