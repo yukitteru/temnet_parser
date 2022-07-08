@@ -13,6 +13,7 @@ define(function () {
                 ]
             },
             form
+
         ]
     }
 })
@@ -22,6 +23,9 @@ let from = {
     label: "От",
     id: "from",
     name: "from",
+    required: true,
+    validate: webix.rules.isNotEmpty(),
+    invalidMessage:"Поле 'От' не может быть пустым",
     stringResult: true
 };
 
@@ -30,6 +34,9 @@ let to = {
     label: "До",
     id: "to",
     name: "to",
+    required: true,
+    validate: webix.rules.isNotEmpty(),
+    invalidMessage:"Поле 'До' не может быть пустым",
     stringResult: true
 }
 
@@ -66,7 +73,12 @@ let form = {
     view: "form",
     id: "search",
     elementsConfig: {
-        labelWidth: 130
+        labelWidth: 130,
+        on: {
+            'onChange': function (newv, oldv) {
+                this.validate();
+            }
+        }
     },
     elements: [
         {
@@ -74,25 +86,30 @@ let form = {
             id: "organization",
             name: "organization",
             label: "Организация",
+            required: true,
+            validate: webix.rules.isNotEmpty(),
+            invalidMessage:"Поле 'Организация' не может быть пустым",
             value: ""
         },
         from, to, statusForm, options,
         {
             view: "button", value: "Поиск", click: function () {
-                if (!dTable) {
-                    id = Math.random()
-                    dTable = createTable()
-                } else {
-                    $$('orgList' + id.toString()).getTopParentView().hide();
-                    id = Math.random();
-                    dTable = createTable();
+                if (this.getParentView().validate())
+                    if (!dTable) {
+                        id = Math.random()
+                        dTable = createTable()
+                    } else {
+                        $$('orgList' + id.toString()).getTopParentView().hide();
+                        id = Math.random();
+                        dTable = createTable();
+                    }
+                else {
+                    webix.message({type: "error", text: "Произошла ошибка при вводе данных"});
                 }
-
             }
         },
     ]
 }
-
 
 function getPropertyValue(id) {
     return $$(id).getValue();
@@ -151,6 +168,7 @@ function createTable() {
                     {id: "username", header: "Имя пользователя", width: 200},
                     {id: "count", header: "Количество", width: 100}
                 ],
+
                 url: 'resource->' +
                     'http://localhost:8080/' + buildRepositoryLink(),
 
