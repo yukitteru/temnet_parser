@@ -4,7 +4,6 @@ import com.temnet.parser.domain.Archive;
 import com.temnet.parser.domain.Report;
 import com.temnet.parser.domain.Status;
 import com.temnet.parser.repo.ArchiveRepository;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,10 +24,15 @@ public class ArchiveService {
     private final Pattern closed = Pattern.compile("^.*(ЗАКРЫТА ЗАЯВКА|ЗАЯВКА ЗАКРЫТА).*", Pattern.CASE_INSENSITIVE);
     private final Pattern inProgress = Pattern.compile("^.*(В РАБОТЕ ЗАЯВКА|ЗАЯВКА В РАБОТЕ).*", Pattern.CASE_INSENSITIVE);
     private final Pattern rejected = Pattern.compile("^.*(ОТКЛОНЕНА ЗАЯВКА|ЗАЯВКА ОТКЛОНЕНА).*", Pattern.CASE_INSENSITIVE);
-    private final ArchiveRepository repo;
 
-    public ArchiveService(ArchiveRepository repo) {
+    private final ArchiveRepository repo;
+    private final CustomUserService customUserService;
+    private final GroupService groupService;
+
+    public ArchiveService(ArchiveRepository repo, CustomUserService customUserService, GroupService groupService) {
         this.repo = repo;
+        this.customUserService = customUserService;
+        this.groupService = groupService;
     }
 
     public Page<Report> getReport(Page<Archive> archive) {
@@ -58,10 +57,13 @@ public class ArchiveService {
         }
     }
 
-    public Page<Report> getOrgData(String username, Timestamp from, Timestamp to, Status status, @PageableDefault(size = 15) Pageable pageable) {
+
+    public Page<Report> getDataByStatus(Long gid, Long uid, Timestamp from, Timestamp to, Status status, @PageableDefault(size = 15) Pageable pageable) {
         pageable = Pageable.unpaged();
         String statusString = getStatusString(status);
-        Page<Archive> find = repo.findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
+        Page<Archive> find;
+        String username = uid == -1 ? groupService.findById(gid) : customUserService.findUserById(uid);
+        find = repo.findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
                 username,
                 from,
                 to,
@@ -71,17 +73,28 @@ public class ArchiveService {
         return getReport(find);
     }
 
-    public Page<Report> getAllData( Timestamp from, Timestamp to, Status status, @PageableDefault(size = 15) Pageable pageable) {
+    public Page<Report> getDataByCustomMessage(String username, Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
         pageable = Pageable.unpaged();
-        String statusString = getStatusString(status);
-        Page<Archive> find = repo.findAllByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
-                from,
-                to,
-                statusString,
-                pageable
-        );
+        Page<Archive> find;
+        if (!username.equals("")) {
+            find = repo.findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
+                    username,
+                    from,
+                    to,
+                    txt,
+                    pageable
+            );
+        } else {
+            find = repo.findAllByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(
+                    from,
+                    to,
+                    txt,
+                    pageable
+            );
+        }
         return getReport(find);
     }
+
 
     private String match(Pattern p, String in) {
         Matcher m = p.matcher(in);

@@ -1,12 +1,11 @@
 package com.temnet.parser.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.temnet.parser.dto.ListItemDto;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 
 public abstract class AbstractController<T, R extends JpaRepository<T, ?>> {
     protected R repo;
@@ -15,12 +14,9 @@ public abstract class AbstractController<T, R extends JpaRepository<T, ?>> {
         this.repo = repo;
     }
 
-    public Page<T> list(@PageableDefault Pageable pageable) {
-        return repo.findAll(pageable);
+    @GetMapping
+    public List<T> getAll() {
+        return repo.findAll();
     }
 
-    @PostMapping
-    public T add(@RequestBody T obj) {
-        return repo.save(obj);
-    }
 }
