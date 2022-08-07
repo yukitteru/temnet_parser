@@ -16,7 +16,7 @@ define(function () {
         ]
     }
 })
-
+let group, username, text, dTable, id;
 
 let from = {
     view: "datepicker",
@@ -29,7 +29,6 @@ let from = {
     stringResult: true
 };
 
-
 let to = {
     view: "datepicker",
     label: "До",
@@ -41,42 +40,33 @@ let to = {
     stringResult: true
 }
 
-let messageSearchField = {
-        view: "text",
-        id: "message",
-        name: "message",
-        label: "Поиск по сообщению",
-        value: ""
-    },
-
     statusForm = {
         view: "label",
         width: 50
     };
 
+let option_data = [
+    {id: 'in_progress', value: "ЗАЯВКА В РАБОТЕ"},
+    {id: 'rejected', value: "ЗАКРЫТА ЗАЯВКА"},
+    {id: 'close', value: "ЗАЯВКА ОТКЛОНЕНА"}
+];
+
+
 let options = {
-    view: "segmented",
+    view: "combo",
     name: "status",
     id: "status",
-    options:
-        [
-            {
-                id: "in_progress",
-                value: "ЗАЯВКА В РАБОТЕ",
-            },
-            {
-                id: "rejected",
-                value: "ЗАЯВКА ОТКЛОНЕНА"
-            },
-            {
-                id: "close",
-                value: "ЗАЯВКА ЗАКРЫТА"
-            },
-        ]
-};
+    label: 'Сообщение',
+    value: '',
+    options: {
+        filter: function (item, value) {
+            text = $$('status').getText();
+            return item.value.toString().toLowerCase().indexOf(value.toLowerCase()) !== -1;
+        },
+        data: option_data,
+    }
 
-let dTable;
-let id;
+};
 
 let groupsStore = new webix.DataCollection({
     url: 'api/groups',
@@ -100,37 +90,55 @@ let form = {
     },
     elements: [
         {
-            view: "richselect",
+            view: "combo",
             id: 'group',
             name: 'group',
             label: 'Группа:',
-            placeholder: 'Оставьте пустым для получения статистики по всем группам',
-            value: 'all',
-            clear:1,
+            placeholder: 'Выберите "ВСЕ" для поиска по всем группам',
+            clear: 1,
             options: groupsStore,
             on: {
                 onChange: function () {
-                    let pos = $$("search").index($$("group")) + 1;
-                    $$("search").removeView("users")
-                    let usersStore = new webix.DataCollection({
-                        url: 'api/users/' + getPropertyValue('group'),
-                        scheme: {
-                            $init: function (obj) {
-                                obj.value = obj.username;
+                    if ($$('group').getText() !== 'ВСЕ' && $$('group').getText() !== '') {
+                        let usersStore = new webix.DataCollection({
+                            url: 'api/users/' + getPropertyValue('group'),
+                            scheme: {
+                                $init: function (obj) {
+                                    obj.value = obj.username;
+                                }
                             }
+                        });
+                        if (!!$$('search').queryView({id: 'users'})) {
+                            $$('search').removeView('users');
+                            let pos = $$("search").index($$("group")) + 1;
+                            $$("search").addView({
+                                view: "combo",
+                                labelWidth: 130,
+                                id: 'users',
+                                name: 'users',
+                                label: 'Пользователь:',
+                                placeholder: 'Оставьте пустым для получения статистики по всей группе',
+                                value: -1,
+                                clear: 1,
+                                options: usersStore
+                            }, pos);
+                        } else {
+                            let pos = $$("search").index($$("group")) + 1;
+                            $$("search").addView({
+                                view: "combo",
+                                labelWidth: 130,
+                                id: 'users',
+                                name: 'users',
+                                label: 'Пользователь:',
+                                placeholder: 'Оставьте пустым для получения статистики по всей группе',
+                                value: -1,
+                                clear: 1,
+                                options: usersStore
+                            }, pos);
                         }
-                    });
-                    $$("search").addView({
-                        view: "richselect",
-                        labelWidth: 130,
-                        id: 'users',
-                        name: 'users',
-                        label: 'Пользователь:',
-                        placeholder: 'Оставьте пустым для получения статистики по всей группе',
-                        value: -1,
-                        clear:1,
-                        options: usersStore
-                    }, pos);
+                    } else {
+                        $$("search").removeView("users");
+                    }
                 }
             }
         },
@@ -142,12 +150,14 @@ let form = {
                     if (!dTable) {
                         id = Math.random()
                         dTable = createTable();
-                        $$('users').setValue('all')
+                        $$('users').setValue(-1);
+                        $$('status').setValue('');
                     } else {
                         $$('orgList' + id.toString()).getTopParentView().hide();
                         id = Math.random();
                         dTable = createTable();
-                        $$('users').setValue('all')
+                        $$('users').setValue(-1);
+                        $$('status').setValue('');
                     }
                 else {
                     webix.message({type: "error", text: "Произошла ошибка при вводе данных"});
@@ -194,14 +204,22 @@ function getListId() {
 }
 
 function buildRepositoryLink() {
-    if (getPropertyValue('users') === -1) {
+    if($$('group').getValue() === 1)  {
+        return "api/archive/search/all" +
+            "/" +
+            date_formatter(getPropertyValue("from")) +
+            "/" +
+            date_formatter(getPropertyValue("to")) +
+            "/" +
+            text;
+    } else if (getPropertyValue('users') === -1) {
         return "api/archive/search/" + getPropertyValue('group') + '/-1' +
             "/" +
             date_formatter(getPropertyValue("from")) +
             "/" +
             date_formatter(getPropertyValue("to")) +
             "/" +
-            getPropertyValue("status");
+            text;
     } else {
         return "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') +
             "/" +
@@ -209,7 +227,7 @@ function buildRepositoryLink() {
             "/" +
             date_formatter(getPropertyValue("to")) +
             "/" +
-            getPropertyValue("status");
+            text;
     }
 
 }
@@ -227,7 +245,21 @@ function createTable() {
 
                 url: 'resource->' +
                     'http://localhost:8080/' + buildRepositoryLink(),
+                on:{
+                    onBeforeLoad:function(){
+                        this.showOverlay("Loading...");
+                    },
+                    onAfterLoad:function(){
+                        this.hideOverlay();
+                    }
+                },
 
+                ready:function(){
+                    if(!this.count()){
+                        webix.extend(this, webix.OverlayBox);
+                        this.showOverlay("<div style='margin:75px; font-size:20px;'>Данные не найдены</div>");
+                    }
+                },
                 autowidth: true,
                 autoheight: true,
                 editable: false,
@@ -240,7 +272,8 @@ function createTable() {
                 size: 5,
                 group: 5,
                 template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
-            }
+            },
+
         ]
     })
 }

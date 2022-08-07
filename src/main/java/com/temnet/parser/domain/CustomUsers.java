@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "custom_users", schema = "ejabberd")
+@Table(name = "usr", schema = "ejabberd")
 public class CustomUsers {
     private long id;
     private String username;

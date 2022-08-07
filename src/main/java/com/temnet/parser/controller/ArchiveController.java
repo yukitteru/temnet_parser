@@ -31,15 +31,20 @@ public class ArchiveController extends AbstractController<Archive, ArchiveReposi
         this.groupsRepository = groupsRepository;
     }
 
-    @GetMapping( "/search/{gid}/{uid}/{from}/{to}/{status}")
-    public Page<Report> getDataByStatus(@PathVariable Long gid, @PathVariable Long uid, @PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable Status status, @PageableDefault(size = 15) Pageable pageable) {
-        return archiveService.getDataByStatus(gid, uid, from, to, status, pageable);
-    }
-
     @GetMapping("/users/{id}")
     public List<String> getUsersByGroup(@PathVariable Long id) {
         List<CustomUsers> allByGroupsByGroupsId = customUsersRepository.findAllByGroupOrderByUsernameAsc(groupsRepository.findByIdOrderByNameAsc(id));
         return allByGroupsByGroupsId.stream().map(CustomUsers::getUsername).collect(Collectors.toList());
+    }
+
+    @GetMapping("/search/{gid}/{uid}/{from}/{to}/{txt}")
+    public Page<Report> getDataByCustomMessage(@PathVariable Long gid, @PathVariable Long uid, @PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable String txt, @PageableDefault Pageable pageable) {
+        return archiveService.getDataByCustomMessage(gid, uid, from, to, txt, pageable);
+    }
+
+    @GetMapping("/search/all/{from}/{to}/{txt}")
+    public Page<Report> getAllDataByCustomMessage(@PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable String txt, @PageableDefault Pageable pageable) {
+        return archiveService.getAllDataByCustomMessage(from, to, txt, pageable);
     }
 
 

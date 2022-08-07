@@ -11,7 +11,8 @@ import java.sql.Timestamp;
 @Repository
 public interface ArchiveRepository extends JpaRepository<Archive, Long> {
 
-    Page<Archive> findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(String username, Timestamp createdAt, Timestamp createdAt2, String txt, Pageable pageable);
-    Page<Archive> findAllByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxt(Timestamp createdAt, Timestamp createdAt2, String txt, Pageable pageable);
+    Page<Archive> findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(String username, Timestamp createdAt, Timestamp createdAt2, String txt, Pageable pageable);
+    Page<Archive> findAllByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(Timestamp createdAt, Timestamp createdAt2, String txt, Pageable pageable);
+    Long countArchiveByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(Timestamp createdAt, Timestamp createdAt2, String txt);
 
 }
