@@ -6,6 +6,7 @@ import com.temnet.parser.repo.CustomUsersRepository;
 import com.temnet.parser.repo.GroupsRepository;
 import com.temnet.parser.service.ArchiveService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +49,18 @@ public class ArchiveController extends AbstractController<Archive, ArchiveReposi
     @GetMapping("/search/all/{from}/{to}/{txt}")
     public Page<Report> getAllDataByCustomMessage(@PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable String txt, @PageableDefault Pageable pageable) {
         return archiveService.getAllDataByCustomMessage(from, to, txt, pageable);
+    }
+
+    @GetMapping("/search/{gid}/{uid}/{from}/{to}/{txt}/totalCount")
+    public Page<Report> getTotalCountDataByCustomMessage(@PathVariable Long gid, @PathVariable Long uid, @PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable String txt, @PageableDefault Pageable pageable) {
+        List<Report> result = new ArrayList<>();
+        Page<Report> dataByCustomMessage = archiveService.getDataByCustomMessage(gid, uid, from, to, txt, pageable);
+        long count = 0;
+        for (Report r : dataByCustomMessage) {
+            count += r.getCount();
+        }
+        result.add(new Report("ВСЕГО", count));
+        return new PageImpl<>(result);
     }
 
 

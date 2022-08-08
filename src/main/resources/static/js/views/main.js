@@ -17,6 +17,7 @@ define(function () {
     }
 })
 let group, username, text, dTable, id;
+let totalCount;
 
 let from = {
     view: "datepicker",
@@ -40,10 +41,10 @@ let to = {
     stringResult: true
 }
 
-    statusForm = {
-        view: "label",
-        width: 50
-    };
+statusForm = {
+    view: "label",
+    width: 50
+};
 
 let option_data = [
     {id: 'in_progress', value: "ЗАЯВКА В РАБОТЕ"},
@@ -58,12 +59,21 @@ let options = {
     id: "status",
     label: 'Сообщение',
     value: '',
+    required: true,
+    validate: webix.rules.isNotEmpty(),
+    invalidMessage: "Поле 'Группа' не может быть пустым",
     options: {
         filter: function (item, value) {
-            text = $$('status').getText();
+            text = $$('status').getText()
             return item.value.toString().toLowerCase().indexOf(value.toLowerCase()) !== -1;
         },
         data: option_data,
+
+    },
+    on: {
+        onChange: function () {
+            text = $$('status').getText()
+        }
     }
 
 };
@@ -96,6 +106,9 @@ let form = {
             label: 'Группа:',
             placeholder: 'Выберите "ВСЕ" для поиска по всем группам',
             clear: 1,
+            required: true,
+            validate: webix.rules.isNotEmpty(),
+            invalidMessage: "Поле 'Группа' не может быть пустым",
             options: groupsStore,
             on: {
                 onChange: function () {
@@ -118,9 +131,8 @@ let form = {
                                 name: 'users',
                                 label: 'Пользователь:',
                                 placeholder: 'Оставьте пустым для получения статистики по всей группе',
-                                value: -1,
                                 clear: 1,
-                                options: usersStore
+                                options: usersStore,
                             }, pos);
                         } else {
                             let pos = $$("search").index($$("group")) + 1;
@@ -131,18 +143,14 @@ let form = {
                                 name: 'users',
                                 label: 'Пользователь:',
                                 placeholder: 'Оставьте пустым для получения статистики по всей группе',
-                                value: -1,
                                 clear: 1,
                                 options: usersStore
                             }, pos);
                         }
-                    } else {
-                        $$("search").removeView("users");
-                    }
+                    } else $$("search").removeView("users");
                 }
             }
         },
-
         from, to, statusForm, options,
         {
             view: "button", value: "Поиск", click: function () {
@@ -155,18 +163,17 @@ let form = {
                     } else {
                         $$('orgList' + id.toString()).getTopParentView().hide();
                         id = Math.random();
+                        webix.message({type: 'info', text: 'Данные загружаются. Ожидайте'})
                         dTable = createTable();
                         $$('users').setValue(-1);
                         $$('status').setValue('');
                     }
-                else {
-                    webix.message({type: "error", text: "Произошла ошибка при вводе данных"});
-                }
             }
         },
     ]
 
 }
+
 
 function getPropertyValue(id) {
     return $$(id).getValue();
@@ -204,78 +211,56 @@ function getListId() {
 }
 
 function buildRepositoryLink() {
-    if($$('group').getValue() === 1)  {
-        return "api/archive/search/all" +
-            "/" +
-            date_formatter(getPropertyValue("from")) +
-            "/" +
-            date_formatter(getPropertyValue("to")) +
-            "/" +
-            text;
-    } else if (getPropertyValue('users') === -1) {
-        return "api/archive/search/" + getPropertyValue('group') + '/-1' +
-            "/" +
-            date_formatter(getPropertyValue("from")) +
-            "/" +
-            date_formatter(getPropertyValue("to")) +
-            "/" +
-            text;
+    if ($$('group').getText() === 'ВСЕ') {
+        return "api/archive/search/all/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
     } else {
-        return "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') +
-            "/" +
-            date_formatter(getPropertyValue("from")) +
-            "/" +
-            date_formatter(getPropertyValue("to")) +
-            "/" +
-            text;
-    }
+        return getPropertyValue('users') === '' || $$('users').getText() === '' ?
+            "api/archive/search/" + getPropertyValue('group') + '/-1' + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
+            "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
 
+    }
 }
 
 function createTable() {
     return webix.ui({
-        rows: [
-            {
-                id: 'orgList' + id.toString(),
-                view: "datatable",
-                columns: [
-                    {id: "username", header: "Имя пользователя", width: 200},
-                    {id: "count", header: "Количество", width: 100}
-                ],
-
-                url: 'resource->' +
-                    'http://localhost:8080/' + buildRepositoryLink(),
-                on:{
-                    onBeforeLoad:function(){
-                        this.showOverlay("Loading...");
+            rows: [
+                {
+                    id: 'orgList' + id.toString(),
+                    view: "datatable",
+                    columns: [
+                        {id: 'username', header: "Имя пользователя", width: 200},
+                        {id: 'count', header: "Количество", width: 100}
+                    ],
+                    url: 'resource->' +
+                        'http://localhost:8080/' + buildRepositoryLink(),
+                    autowidth: true,
+                    autoheight: true,
+                    editable: false,
+                    datafetch: 100,
+                    pager: 'orgPager' + id.toString()
+                },
+                {
+                    view: "pager",
+                    id: 'orgPager' + id.toString(),
+                    size: 5,
+                    group: 5,
+                    template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
+                },
+                {
+                    id: "list1",
+                    view:"list",
+                    template:"#username#: #count#",
+                    type:{
+                        height:65
                     },
-                    onAfterLoad:function(){
-                        this.hideOverlay();
-                    }
-                },
+                    select:true,
+                    url: 'resource->' +
+                            'http://localhost:8080/' + buildRepositoryLink() + "/totalCount"
 
-                ready:function(){
-                    if(!this.count()){
-                        webix.extend(this, webix.OverlayBox);
-                        this.showOverlay("<div style='margin:75px; font-size:20px;'>Данные не найдены</div>");
-                    }
                 },
-                autowidth: true,
-                autoheight: true,
-                editable: false,
-                datafetch: 100,
-                pager: 'orgPager' + id.toString()
-            },
-            {
-                view: "pager",
-                id: 'orgPager' + id.toString(),
-                size: 5,
-                group: 5,
-                template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
-            },
-
-        ]
-    })
+            ],
+        }
+    )
 }
 
 
