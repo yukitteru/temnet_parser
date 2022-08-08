@@ -52,9 +52,8 @@ public class ArchiveService {
     public Page<Report> getAllDataByCustomMessage(Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
         pageable = Pageable.unpaged();
         Page<Archive> find;
-        List<Report> r = List.of(
-                new Report("ВСЕ", archiveRepository.countArchiveByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(from, to, txt) / 2)
-        );
+        List<Report> r = new ArrayList<>();
+        r.add(new Report("ВСЕ", archiveRepository.countArchiveByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(from, to, txt) / 2));
         return new PageImpl<>(r);
     }
 
