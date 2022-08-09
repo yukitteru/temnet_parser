@@ -1,6 +1,8 @@
 package com.temnet.parser.controller;
 
-import com.temnet.parser.domain.*;
+import com.temnet.parser.domain.Archive;
+import com.temnet.parser.domain.CustomUsers;
+import com.temnet.parser.domain.Report;
 import com.temnet.parser.repo.ArchiveRepository;
 import com.temnet.parser.repo.CustomUsersRepository;
 import com.temnet.parser.repo.GroupsRepository;
@@ -16,9 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,14 +54,9 @@ public class ArchiveController extends AbstractController<Archive, ArchiveReposi
     @GetMapping("/search/{gid}/{uid}/{from}/{to}/{txt}/totalCount")
     public Page<Report> getTotalCountDataByCustomMessage(@PathVariable Long gid, @PathVariable Long uid, @PathVariable Timestamp from, @PathVariable Timestamp to, @PathVariable String txt, @PageableDefault Pageable pageable) {
         List<Report> result = new ArrayList<>();
-        Page<Report> dataByCustomMessage = archiveService.getDataByCustomMessage(gid, uid, from, to, txt, pageable);
-        long count = 0;
-        for (Report r : dataByCustomMessage) {
-            count += r.getCount();
-        }
-        result.add(new Report("ВСЕГО", count));
+        Page<Report> dataByCustomMessage = getDataByCustomMessage(gid, uid, from, to, txt, pageable);
+        result.add(new Report("ВСЕГО", dataByCustomMessage.getTotalElements()));
         return new PageImpl<>(result);
     }
-
 
 }
