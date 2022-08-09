@@ -1,12 +1,15 @@
 package com.temnet.parser.controller;
 
-import com.temnet.parser.dto.ListItemDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
+/**
+ * Abstract controller class using REST API to present data preprocessed by the corresponding service class*
+ *
+ * @author Temnet
+ */
 public abstract class AbstractController<T, R extends JpaRepository<T, ?>> {
     protected R repo;
 

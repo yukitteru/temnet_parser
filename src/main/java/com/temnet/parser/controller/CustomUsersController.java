@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * CustomUsers Controller class using REST API to present data preprocessed by the corresponding service class*
+ *
+ * @author Temnet
+ */
 @RestController
 @RequestMapping("/api/users")
 public class CustomUsersController extends AbstractController<CustomUsers, CustomUsersRepository> {

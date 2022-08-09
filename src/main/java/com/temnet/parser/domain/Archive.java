@@ -14,13 +14,30 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+/**
+ * Archive class using JPA to represent tables and rows as POJOs
+ *
+ * @author Temnet
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 public class Archive {
+    /**
+     * User name
+     */
     private String username;
+    /**
+     * Message
+     */
     private String txt;
+    /**
+     * Message identifier
+     */
     private long id;
+    /**
+     * Date and time the message was sent
+     */
     private Timestamp createdAt;
 
     @Basic

@@ -19,11 +19,28 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Service class for processing business logic related to the Archive entity
+ * <p>
+ * Please see the {@link Archive} class for true identity
+ *
+ * @author Temnet
+ */
 @Service
 @Transactional
 public class ArchiveService {
+    /**
+     * @see ArchiveRepository
+     */
     private final ArchiveRepository archiveRepository;
+    /**
+     * @see com.temnet.parser.repo.CustomUsersRepository
+     */
     private final CustomUserService customUserService;
+
+    /**
+     * @see com.temnet.parser.repo.GroupsRepository
+     */
     private final GroupService groupService;
 
     public ArchiveService(ArchiveRepository archiveRepository, CustomUserService customUserService, GroupService groupService) {
@@ -32,6 +49,13 @@ public class ArchiveService {
         this.groupService = groupService;
     }
 
+    /**
+     * Takes as a parameter a list typed with the type 'Archive' and returns a list typed with the type 'Report'
+     *
+     * @param archive list of archives to be processed
+     * @see Archive
+     * @see Report
+     */
     public Page<Report> getReport(Page<Archive> archive) {
         LinkedHashMap<String, Long> stringLongLinkedHashMap = new LinkedHashMap<>();
         List<Report> report = new ArrayList<>();
@@ -41,6 +65,22 @@ public class ArchiveService {
         return new PageImpl<>(report);
     }
 
+    /**
+     * The method accepts the start date and end date of the search, as well as the text of the message,
+     * and returns a paginated representation of the users and messages count
+     *
+     * @param gid      group identifier
+     * @param uid      user identifier
+     * @param from     search start date
+     * @param to       search end date
+     * @param txt      message text
+     * @param pageable pagination parameters
+     * @return count of all messages
+     * @see GroupService
+     * @see CustomUserService
+     * @see ArchiveRepository
+     * @see Report
+     */
     public Page<Report> getDataByCustomMessage(Long gid, Long uid, Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
         pageable = Pageable.unpaged();
         Page<Archive> find;
@@ -49,6 +89,18 @@ public class ArchiveService {
         return getReport(find);
     }
 
+    /**
+     * The method accepts the start date and end date of the search, as well as the text of the message,
+     * and returns a pagination of a list of all users and the count of messages
+     *
+     * @param from     search start date
+     * @param to       search end date
+     * @param txt      message text
+     * @param pageable pagination parameters
+     * @return paginated view of the summary report list
+     * @see ArchiveRepository
+     * @see Report
+     */
     public Page<Report> getAllDataByCustomMessage(Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
         pageable = Pageable.unpaged();
         Page<Archive> find;
@@ -57,8 +109,14 @@ public class ArchiveService {
         return new PageImpl<>(r);
     }
 
-    private Map<String, Long> orderByValue(LinkedHashMap<String, Long> resultMap) {
-        Stream<Map.Entry<String, Long>> sorted = resultMap.entrySet().stream()
+    /**
+     * Takes a LinkedHashMap<String, Long> as input and sorts the values in descending order
+     *
+     * @param map LinkedHashMap<String, Long>
+     * @return sorted LinkedHashMap<String, Long>
+     */
+    private Map<String, Long> orderByValue(LinkedHashMap<String, Long> map) {
+        Stream<Map.Entry<String, Long>> sorted = map.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()));
         return sorted.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }

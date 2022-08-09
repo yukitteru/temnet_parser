@@ -9,6 +9,13 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Groups class using JPA to represent tables and rows as POJOs
+ * JsonIdentityInfo uses custom resolver to resolve circular references
+ *
+ * @author Temnet
+ * @see EntityIdResolver
+ */
 @Entity
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -17,8 +24,17 @@ import java.util.Objects;
         property = "id"
 )
 public class Groups {
+    /**
+     * Group identifier
+     */
     private long id;
+    /**
+     * Group name
+     */
     private String name;
+    /**
+     * List of users associated with groups
+     */
     private Collection<CustomUsers> customUsers;
 
     @Id

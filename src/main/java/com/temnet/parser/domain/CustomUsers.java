@@ -12,11 +12,28 @@ import javax.persistence.Table;
 
 import java.util.Objects;
 
+/**
+ * CustomUsers class using JPA to represent tables and rows as POJOs
+ *
+ * @author Temnet
+ */
 @Entity
 @Table(name = "usr", schema = "ejabberd")
 public class CustomUsers {
+    /**
+     * User id
+     */
     private long id;
+    /**
+     * User name
+     */
     private String username;
+    /**
+     * Foreign key to the Groups table storing the user's group ID
+     * The field is serialized by ID
+     *
+     * @see Groups
+     */
     @JsonIdentityReference(alwaysAsId = true)
     private Groups group;
 
