@@ -80,11 +80,6 @@ let options = {
 
 let groupsStore = new webix.DataCollection({
     url: 'api/groups',
-    scheme: {
-        $init: function (obj) {
-            obj.value = obj.name;
-        }
-    }
 });
 
 let form = {
@@ -104,22 +99,14 @@ let form = {
             id: 'group',
             name: 'group',
             label: 'Группа:',
-            placeholder: 'Выберите "ВСЕ" для поиска по всем группам',
+            placeholder: 'Оставьте пустым для получения статистики по всем группам и пользователям',
             clear: 1,
-            required: true,
-            validate: webix.rules.isNotEmpty(),
-            invalidMessage: "Поле 'Группа' не может быть пустым",
             options: groupsStore,
             on: {
                 onChange: function () {
                     if ($$('group').getText() !== 'ВСЕ' && $$('group').getText() !== '') {
                         let usersStore = new webix.DataCollection({
                             url: 'api/users/' + getPropertyValue('group'),
-                            scheme: {
-                                $init: function (obj) {
-                                    obj.value = obj.username;
-                                }
-                            }
                         });
                         if (!!$$('search').queryView({id: 'users'})) {
                             $$('search').removeView('users');
@@ -211,14 +198,14 @@ function getListId() {
 }
 
 function buildRepositoryLink() {
-    if ($$('group').getText() === 'ВСЕ') {
-        return "api/archive/search/all/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
-    } else {
+    if(getPropertyValue('group') === '' || $$('group').getText() === '') {
+        return "api/archive/search/all/" + getPropertyValue("from") + "/" + getPropertyValue("to") + "/" + text;
+    }
         return getPropertyValue('users') === '' || $$('users').getText() === '' ?
-            "api/archive/search/" + getPropertyValue('group') + '/-1' + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
+            "api/archive/search/" + getPropertyValue('group') + '/all' + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
             "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
 
-    }
+
 }
 
 function createTable() {
@@ -242,12 +229,12 @@ function createTable() {
                 {
                     view: "pager",
                     id: 'orgPager' + id.toString(),
-                    size: 5,
-                    group: 5,
+                    size: 4,
+                    group: 4,
                     template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
                 },
                 {
-                    id: "list1",
+                    id: "list" + id.toString(),
                     view:"list",
                     template:"#username#: #count#",
                     type:{

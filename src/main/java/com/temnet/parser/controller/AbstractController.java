@@ -17,9 +17,4 @@ public abstract class AbstractController<T, R extends JpaRepository<T, ?>> {
         this.repo = repo;
     }
 
-    @GetMapping
-    public List<T> getAll() {
-        return repo.findAll();
-    }
-
 }

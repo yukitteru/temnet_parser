@@ -3,29 +3,19 @@ package com.temnet.parser.service;
 import com.temnet.parser.domain.Archive;
 import com.temnet.parser.domain.Report;
 import com.temnet.parser.repo.ArchiveRepository;
+import com.temnet.parser.repo.spec.ArchiveSpecification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Service class for processing business logic related to the Archive entity
- * <p>
- * Please see the {@link Archive} class for true identity
- *
- * @author Temnet
- */
 @Service
 @Transactional
 public class ArchiveService {
@@ -33,21 +23,12 @@ public class ArchiveService {
      * @see ArchiveRepository
      */
     private final ArchiveRepository archiveRepository;
-    /**
-     * @see com.temnet.parser.repo.CustomUsersRepository
-     */
-    private final CustomUserService customUserService;
 
-    /**
-     * @see com.temnet.parser.repo.GroupsRepository
-     */
-    private final GroupService groupService;
-
-    public ArchiveService(ArchiveRepository archiveRepository, CustomUserService customUserService, GroupService groupService) {
+    @Autowired
+    public ArchiveService(ArchiveRepository archiveRepository) {
         this.archiveRepository = archiveRepository;
-        this.customUserService = customUserService;
-        this.groupService = groupService;
     }
+
 
     /**
      * Takes as a parameter a list typed with the type 'Archive' and returns a list typed with the type 'Report'
@@ -65,27 +46,31 @@ public class ArchiveService {
         return new PageImpl<>(report);
     }
 
+
     /**
      * The method accepts the start date and end date of the search, as well as the text of the message,
      * and returns a paginated representation of the users and messages count
      *
-     * @param gid      group identifier
-     * @param uid      user identifier
+     * @param grp      group name
+     * @param username      user name
      * @param from     search start date
      * @param to       search end date
-     * @param txt      message text
+     * @param message      message text
      * @param pageable pagination parameters
      * @return count of all messages
-     * @see GroupService
-     * @see CustomUserService
      * @see ArchiveRepository
      * @see Report
      */
-    public Page<Report> getDataByCustomMessage(Long gid, Long uid, Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
+    public Page<Report> getDataByCustomMessage(String grp, String username, Timestamp from, Timestamp to, String message, Pageable pageable) {
         pageable = Pageable.unpaged();
         Page<Archive> find;
-        String username = uid == -1 ? groupService.findById(gid) : customUserService.findUserById(uid);
-        find = archiveRepository.findByUsernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(username, from, to, txt, pageable);
+        username = username.equals("all") ? grp : username;
+        find = archiveRepository.findAll(ArchiveSpecification.usernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(
+                username,
+                from,
+                to,
+                Arrays.stream(message.split(" ")).collect(Collectors.toList())
+        ), pageable);
         return getReport(find);
     }
 
@@ -95,19 +80,24 @@ public class ArchiveService {
      *
      * @param from     search start date
      * @param to       search end date
-     * @param txt      message text
+     * @param message      message text
      * @param pageable pagination parameters
      * @return paginated view of the summary report list
      * @see ArchiveRepository
      * @see Report
      */
-    public Page<Report> getAllDataByCustomMessage(Timestamp from, Timestamp to, String txt, @PageableDefault(size = 15) Pageable pageable) {
+    public Page<Report> getAllDataByCustomMessage(Timestamp from, Timestamp to, String message, Pageable pageable) {
         pageable = Pageable.unpaged();
-        Page<Archive> find;
         List<Report> r = new ArrayList<>();
-        r.add(new Report("ВСЕ", archiveRepository.countArchiveByCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(from, to, txt) / 2));
+        Page<Archive> find = archiveRepository.findAll(ArchiveSpecification.createdAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(
+                from,
+                to,
+                Arrays.stream(message.split(" ")).collect(Collectors.toList())
+        ), pageable);
+        r.add(new Report("ВСЕ", find.getTotalElements()));
         return new PageImpl<>(r);
     }
+
 
     /**
      * Takes a LinkedHashMap<String, Long> as input and sorts the values in descending order
@@ -120,5 +110,4 @@ public class ArchiveService {
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()));
         return sorted.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
-
 }
