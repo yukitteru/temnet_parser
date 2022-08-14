@@ -1,13 +1,13 @@
 ## Начало работы:
 
 ### Необходимо для запуска:
-- JDK 1.8+
+- JDK 11
 - Apache Maven 3.8.5+ 
 
 Скачать:
 JDK:
 ```
-https://adoptium.net/temurin/releases/?version=8
+https://adoptium.net/temurin/releases/?version=11
 ```
 Apache Maven:
 ```
