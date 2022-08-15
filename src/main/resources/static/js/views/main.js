@@ -215,7 +215,7 @@ function createTable() {
             rows: [
                 {
                     view: "form",
-                    id: "export",
+                    id: "export" + id.toString(),
                     css: "toolbar",
                     paddingY: 5,
                     paddingX: 10,
@@ -224,7 +224,7 @@ function createTable() {
                             view: "label"
                         },
                         {
-                            view: "button", id: "excel", label: "Excel", width: 95, click: function () {
+                            view: "button", id: "excel" + id.toString(), label: "Excel", width: 95, click: function () {
                                 webix.toExcel(
                                     [$$("orgList" + id.toString()), $$("list" + id.toString())],
                                     { filename: $$("group").getText(), sheets:["Отдельно", "Всего"]}
@@ -232,7 +232,7 @@ function createTable() {
                             }
                         },
                         {
-                            view: "button", id: "pdf", label: "PDF", width: 95, click: function () {
+                            view: "button", id: "pdf" + id.toString(), label: "PDF", width: 95, click: function () {
                                 webix.toPDF(
                                     [$$("orgList" + id.toString()), $$("list" + id.toString())],
                                     { filename: $$("group").getText()}
@@ -263,13 +263,13 @@ function createTable() {
                                 hide: true,
                                 delay: 40000
                             });
-                            $$("excel").disable()
-                            $$("pdf").disable()
+                            $$("excel" + id.toString()).disable()
+                            $$("pdf" + id.toString()).disable()
                         },
                         onAfterLoad: function () {
                             $$("search").enable();
-                            $$("excel").enable();
-                            $$("pdf").enable();
+                            $$("excel" + id.toString()).enable();
+                            $$("pdf" + id.toString()).enable();
                         }
                     },
                     url: "resource->" + "http://localhost:8080/" + buildRepositoryLink(),
