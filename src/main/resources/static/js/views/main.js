@@ -244,8 +244,8 @@ function createTable() {
                 {
                     view: "pager",
                     id: "orgPager" + id.toString(),
-                    size: 4,
-                    group: 4,
+                    size: 15,
+                    group: 15,
                     template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
                 },
                 {
@@ -273,20 +273,21 @@ function createTable() {
                         }
                     },
                     url: "resource->" + "http://localhost:8080/" + buildRepositoryLink(),
-                    autowidth: true,
-                    autoheight: true,
+                    height: 150,
+                    width: 500,
                     editable: false,
                     datafetch: 100,
-                    pager: "orgPager" + id.toString()
+                    scrollX: false,
+                    pager: "orgPager" + id.toString(),
                 },
                 {
                     id: "list" + id.toString(),
                     view: "list",
                     template: "#username#: #count#:",
+                    scroll: false,
                     type: {
-                        height: 65
+                        height: 30
                     },
-                    select: true,
                     url: "resource->" +
                         "http://localhost:8080/" + buildRepositoryLink() + "/totalCount"
                 },
