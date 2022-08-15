@@ -104,7 +104,7 @@ let form = {
             options: groupsStore,
             on: {
                 onChange: function () {
-                    if ($$('group').getText() !== 'ВСЕ' && $$('group').getText() !== '') {
+                    if ($$('group').getText() !== ' ' && $$('group').getText() !== '') {
                         let usersStore = new webix.DataCollection({
                             url: 'api/users/' + getPropertyValue('group'),
                         });
@@ -144,6 +144,7 @@ let form = {
                 if (this.getParentView().validate())
                     if (!dTable) {
                         id = Math.random()
+                        webix.message({type: 'info', text: 'Данные загружаются. Ожидайте'})
                         dTable = createTable();
                         $$('users').setValue(-1);
                         $$('status').setValue('');
@@ -198,33 +199,41 @@ function getListId() {
 }
 
 function buildRepositoryLink() {
-    if(getPropertyValue('group') === '' || $$('group').getText() === '') {
+    if (getPropertyValue('group') === '' || $$('group').getText() === '') {
         return "api/archive/search/all/" + getPropertyValue("from") + "/" + getPropertyValue("to") + "/" + text;
     }
-        return getPropertyValue('users') === '' || $$('users').getText() === '' ?
-            "api/archive/search/" + getPropertyValue('group') + '/all' + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
-            "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
+    return getPropertyValue('users') === '' || $$('users').getText() === '' ?
+        "api/archive/search/" + getPropertyValue('group') + '/all' + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
+        "api/archive/search/" + getPropertyValue('group') + '/' + getPropertyValue('users') + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
 
 
 }
+
 
 function createTable() {
     return webix.ui({
             rows: [
                 {
-                    id: 'orgList' + id.toString(),
-                    view: "datatable",
-                    columns: [
-                        {id: 'username', header: "Имя пользователя", width: 200},
-                        {id: 'count', header: "Количество", width: 100}
-                    ],
-                    url: 'resource->' +
-                        'http://localhost:8080/' + buildRepositoryLink(),
-                    autowidth: true,
-                    autoheight: true,
-                    editable: false,
-                    datafetch: 100,
-                    pager: 'orgPager' + id.toString()
+                    view: "form",
+                    id: 'export',
+                    css: "toolbar",
+                    paddingY: 5,
+                    paddingX: 10,
+                    cols: [
+                        {
+                            view: "label"
+                        },
+                        {
+                            view: "button", id: 'excel', label: "Excel", width: 95, click: function () {
+                                webix.toExcel($$('orgList' + id.toString()));
+                            }
+                        },
+                        {
+                            view: "button", id: 'pdf', label: "PDF", width: 95, click: function () {
+                                webix.toPDF($$('orgList' + id.toString()));
+                            }
+                        },
+                    ]
                 },
                 {
                     view: "pager",
@@ -234,22 +243,51 @@ function createTable() {
                     template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
                 },
                 {
-                    id: "list" + id.toString(),
-                    view:"list",
-                    template:"#username#: #count#",
-                    type:{
-                        height:65
+                    id: 'orgList' + id.toString(),
+                    view: "datatable",
+                    columns: [
+                        {id: 'username', header: "Имя пользователя", width: 200},
+                        {id: 'count', header: "Количество", width: 100}
+                    ],
+                    on: {
+                        onBeforeLoad: function () {
+                            $$('search').disable()
+                            webix.extend($$('orgList' + id.toString()), webix.ProgressBar);
+                            $$('orgList' + id.toString()).showProgress({
+                                hide: true,
+                                delay: 5000
+                            });
+                            $$('excel').disable()
+                            $$('pdf').disable()
+                        },
+                        onAfterLoad: function () {
+                            $$('search').enable();
+                            $$('excel').enable();
+                            $$('pdf').enable();
+                        }
                     },
-                    select:true,
-                    url: 'resource->' +
-                            'http://localhost:8080/' + buildRepositoryLink() + "/totalCount"
-
+                    url: 'resource->' + 'http://localhost:8080/' + buildRepositoryLink(),
+                    autowidth: true,
+                    autoheight: true,
+                    editable: false,
+                    datafetch: 100,
+                    pager: 'orgPager' + id.toString()
                 },
-            ],
+                {
+                    id: "list" + id.toString(),
+                    view: "list",
+                    template: "#username#: #count#",
+                    type: {
+                        height: 65
+                    },
+                    select: true,
+                    url: 'resource->' +
+                        'http://localhost:8080/' + buildRepositoryLink() + "/totalCount"
+                },
+            ]
         }
     )
 }
-
 
 
 
