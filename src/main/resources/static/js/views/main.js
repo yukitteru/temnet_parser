@@ -1,4 +1,4 @@
-// noinspection JSUnresolvedFunction
+// noinspection JSUnresolvedFunction,JSUnusedLocalSymbols
 // noinspection JSUnresolvedFunction
 
 webix.i18n.setLocale("ru-RU");
@@ -205,7 +205,7 @@ function createTable() {
                 {
                     id: "orgList" + id.toString(),
                     view: "datatable",
-                    borderless: false,
+                    borderless: true,
                     height: 150,
                     width: 500,
                     editable: false,
@@ -238,6 +238,7 @@ function createTable() {
                 {
                     id: "list" + id.toString(),
                     view: "list",
+                    borderless: true,
                     template: "#username#: #count#",
                     scroll: false,
                     type: {
