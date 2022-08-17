@@ -25,18 +25,5 @@ define(function () {
                     }
                 })
         },
-        save: function (view, params) {
-            let id = params.id
-            let url = view.config.url.source
-
-            if (params.operation === 'update') {
-                return ajax.put(url + '/' + id, params.data)
-            } else if (params.operation === 'insert') {
-                delete params.data.id
-                return ajax.post(url, params.data)
-            } else if (params.operation === 'delete') {
-                return ajax.del(url + '/' + id)
-            }
-        }
     }
 })

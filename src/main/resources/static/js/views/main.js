@@ -49,18 +49,21 @@ let form =
                 id: "group",
                 name: "group",
                 label: "Группа:",
-                placeholder: "Оставьте пустым для получения статистики по всем группам и пользователям",
+                placeholder: "Выберите название группы пользователей",
                 clear: 1,
                 options: groupsStore,
                 on: {
                     onAfterRender: function () {
+                        groupsStore.add({id: "all", value: "Все группы"});
                         $$('users').disable();
                     },
                     onChange: function () {
-                        if ($$("group").getText() !== " " && $$("group").getText() !== "") {
+                        if (getPropertyValue("group") !== "all") {
+                            $$("users").setValue("");
                             let usersStore = new webix.DataCollection({
                                 url: "api/users/" + getPropertyValue("group"),
                             });
+                            usersStore.add({id: "all", value: "Все пользователи"});
                             $$("users").enable();
                             $$("users").define("options", usersStore);
                         } else $$("users").disable();
@@ -73,7 +76,7 @@ let form =
                 id: "users",
                 name: "users",
                 label: "Пользователь:",
-                placeholder: "Оставьте пустым для получения статистики по всей группе",
+                placeholder: "Выберите наименование пользователя",
                 clear: 1,
             },
             {
@@ -124,14 +127,14 @@ let form =
                             id = Math.random()
                             webix.message({type: "info", text: "Данные загружаются. Ожидайте"})
                             dTable = createTable();
-                            $$("users").setValue(-1);
+                            $$("users").setValue("");
                             $$("status").setValue("");
                         } else {
                             $$("orgList" + id.toString()).getTopParentView().hide();
                             id = Math.random();
                             webix.message({type: "info", text: "Данные загружаются. Ожидайте"})
                             dTable = createTable();
-                            $$("users").setValue(-1);
+                            $$("users").setValue("");
                             $$("status").setValue("");
                         }
                 }
@@ -153,10 +156,10 @@ function date_formatter(date) {
 }
 
 function buildRepositoryLink() {
-    if (getPropertyValue("group") === "" || $$("group").getText() === "") {
+    if (getPropertyValue("group") === "all" ) {
         return "api/archive/search/all/" + getPropertyValue("from") + "/" + getPropertyValue("to") + "/" + text;
     }
-    return getPropertyValue("users") === "" || $$("users").getText() === "" ?
+    return getPropertyValue("users") === "all" ?
         "api/archive/search/" + getPropertyValue("group") + "/all" + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text :
         "api/archive/search/" + getPropertyValue("group") + "/" + getPropertyValue("users") + "/" + date_formatter(getPropertyValue("from")) + "/" + date_formatter(getPropertyValue("to")) + "/" + text;
 
@@ -227,6 +230,10 @@ function createTable() {
                             $$("pdf" + id.toString()).disable()
                         },
                         onAfterLoad: function () {
+                            if($$("groups") === 'all') {
+                                $$("excel" + id.toString()).disable();
+                                $$("pdf" + id.toString()).disable();
+                            }
                             $$("search").enable();
                             $$("excel" + id.toString()).enable();
                             $$("pdf" + id.toString()).enable();
@@ -251,7 +258,3 @@ function createTable() {
         }
     )
 }
-
-
-
-
