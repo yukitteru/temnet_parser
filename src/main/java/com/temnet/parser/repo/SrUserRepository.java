@@ -16,6 +16,7 @@ public interface SrUserRepository extends JpaRepository<SrUser, Long> {
      * @param grp the group
      * @return the list of users
      */
+
     List<SrUser> findByGrpOrderByJid(String grp);
 
     /**
@@ -25,4 +26,10 @@ public interface SrUserRepository extends JpaRepository<SrUser, Long> {
      */
     @Query("select distinct u.grp from SrUser u order by u.grp")
     List<String> findAllGroups();
+
+    Long countAllByGrp(String grp);
+
+    SrUser findByJidContains(String jid);
+
+
 }

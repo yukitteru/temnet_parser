@@ -1,6 +1,6 @@
 package com.temnet.parser.repo.spec;
 
-import com.temnet.parser.domain.Archive;
+import com.temnet.parser.domain.Report;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
@@ -21,10 +21,10 @@ public class ArchiveSpecification {
      * @param messageParts the message parts
      * @return the Archive specification object
      */
-    public static Specification<Archive> txtContainsAny(Collection<String> messageParts) {
+    public static Specification<Report> txtContainsAny(Collection<String> messageParts) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
-            messageParts.forEach(txtPart -> predicate.getExpressions().add(cb.like(root.get("txt"), "%" + txtPart + "%")));
+            messageParts.forEach(messagePart -> predicate.getExpressions().add(cb.like(root.get("message"), "%" + messagePart + "%")));
             return predicate;
         };
     }
@@ -38,7 +38,7 @@ public class ArchiveSpecification {
      * @param messageParts the message parts
      * @return the Archive specification object
      */
-    public static Specification<Archive> usernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(String username, Timestamp from, Timestamp to, Collection<String> messageParts) {
+    public static Specification<Report> usernameContainsAndCreatedAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(String username, Timestamp from, Timestamp to, Collection<String> messageParts) {
         return (root, query, cb) ->
         {
             Predicate name = username.contains("help") ? cb.notLike(root.get("username"), "% %") : cb.notLike(root.get("username"), "%help%");
@@ -58,7 +58,7 @@ public class ArchiveSpecification {
      * @param messageParts the message parts
      * @return the Archive specification object
      */
-    public static Specification<Archive> createdAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(Timestamp from, Timestamp to, Collection<String> messageParts) {
+    public static Specification<Report> createdAtGreaterThanEqualAndCreatedAtLessThanEqualAndTxtContains(Timestamp from, Timestamp to, Collection<String> messageParts) {
         return (root, query, cb) ->
                 cb.and(cb.greaterThanOrEqualTo(root.get("createdAt"), from),
                         cb.notLike(root.get("username"), "%help%"),
