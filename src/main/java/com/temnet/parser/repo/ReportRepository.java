@@ -21,8 +21,8 @@ public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecif
     Page<Report> findDistinctByGroupname(String groupname, Pageable pageable);
 
     @Query(value = "select r.groupname, count(r2.username), count(r3.id) from report r " +
-            "left join (select id, username from report group by username) r2 on r.id = r2.id " +
-            "left join (select id from report) r3 on r3.id = r.id " +
+            "left join (select id, username, created_at from report where created_at between ?1 and ?2 group by username) r2 on r.id = r2.id " +
+            "left join (select id, created_at from report where created_at between ?1 and ?2) r3 on r3.id = r.id " +
             "group by groupname", nativeQuery = true)
     @Cacheable("activeUsers")
     List<Object[]> findActiveUsers(Timestamp start, Timestamp end);

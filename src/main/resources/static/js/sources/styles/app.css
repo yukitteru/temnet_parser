@@ -1,0 +1,29 @@
+/* statuses */
+.status{
+	font-weight:500;
+}
+.open{
+	color:#41ad7c;
+}
+.soon, .ontime{
+	color:#1CA1C1;
+}
+.last{
+	color:#FF5C4C;
+}
+.landed{
+	color:rgb(243, 166, 1);
+}
+/* notifications list */
+.notifications .webix_list_item{
+	line-height:20px;
+	padding:10px;
+}
+.notifications .webix_list_item .m_title{
+	font-weight:500;
+	color:#313131;
+}
+.notifications .webix_list_item .message{
+	display:block;
+	color:#475466;
+}

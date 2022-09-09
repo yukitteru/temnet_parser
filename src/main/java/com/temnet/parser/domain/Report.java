@@ -2,6 +2,7 @@ package com.temnet.parser.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -62,6 +63,7 @@ public class Report {
 
     @Basic
     @Column(name = "created_at")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     public Timestamp getCreatedAt() {
         return createdAt;
     }

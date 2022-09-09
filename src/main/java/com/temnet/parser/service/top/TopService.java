@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +33,12 @@ public class TopService {
             String gn = (String) objects[0];
             Long au = ((BigInteger) objects[1]).longValue();
             Long mc = ((BigInteger) objects[2]).longValue();
-            return new TopReport(gn, au, accounts.parallelStream()
-                    .filter(u -> u.getJid().contains((String) objects[0]))
-                    .count(), mc);
+            return new TopReport(
+                    gn,
+                    au,
+                    accounts.parallelStream().filter(u -> u.getJid().contains((String) objects[0])).count(),
+                    mc
+            );
         }).collect(Collectors.toList());
         return new PageImpl<>(collect);
     }
