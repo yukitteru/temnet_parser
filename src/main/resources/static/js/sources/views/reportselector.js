@@ -1,8 +1,8 @@
 import {JetView} from "webix-jet";
-import SearchingFlight from "views/searchingflight";
+import SearchingFlight from "jet-views/searchreport";
 
 
-export default class FlightSelectorView extends JetView {
+export default class ReportSelectorView extends JetView {
 	config(){
 		const _ = this.app.getService("locale")._;
 		const theme = this.app.config.theme;
@@ -17,8 +17,7 @@ export default class FlightSelectorView extends JetView {
 					header:_("Выборка"),
 					body:SearchingFlight
 				},
-
-			]
+			],
 		};
 	}
 }

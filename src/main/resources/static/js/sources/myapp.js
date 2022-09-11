@@ -5,14 +5,10 @@ requirejs.config({
     baseUrl: 'js'
 })
 require(
-    ['views/allflights',
-        'views/flightinfo',
-        'views/flightselector',
-        'views/lang',
-        'views/notifications',
-        'views/regularoffers',
-        'views/searchingflight',
-        'views/specialoffers',
+    ['jet-views/allreport',
+        'jet-views/reportselector',
+        'jet-views/searchreport',
+        'jet-views/reportinfo',
         'views/top',
         'util/resourceProxy'],
     function (main, resourceProxy) {
@@ -37,7 +33,7 @@ export default class MyApp extends JetApp {
             version: VERSION,
             router: HashRouter,
             debug: !PRODUCTION,
-            start: "/top/specialoffers",
+            start: "/top/reportinfo",
             theme: theme || ""
         };
 
@@ -45,12 +41,7 @@ export default class MyApp extends JetApp {
 
         let localeConfig = {
             webix: {
-                en: "en-US",
-                ko: "ko-KR",
-                de: "de-DE",
-                zh: "zh-CN",
-                es: "es-ES",
-                ru: "ru-RU"
+
             }
         };
         if (cookies)
@@ -59,7 +50,7 @@ export default class MyApp extends JetApp {
         this.use(plugins.Locale, localeConfig);
 
         this.attachEvent("app:error:resolve", function (err, url) {
-            webix.delay(() => this.show("/top/specialoffers"));
+            webix.delay(() => this.show("/top/reportinfo"));
         });
     }
 }

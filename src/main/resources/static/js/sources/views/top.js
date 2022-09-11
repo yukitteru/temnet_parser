@@ -1,8 +1,8 @@
 import {JetView} from "webix-jet";
-import FlightSelectorView from "views/flightselector";
-import AllFlightsView from "views/allflights";
-import LanguagesPopup from "views/lang";
-import NotificationsPopup from "views/notifications";
+import FlightSelectorView from "jet-views/reportselector";
+import AllFlightsView from "jet-views/allreport";
+import ReportSelectorView from "jet-views/reportselector";
+import AllReportView from "jet-views/allreport";
 
 export default class TopView extends JetView{
 	config(){
@@ -57,31 +57,17 @@ export default class TopView extends JetView{
 					cols:[
 						{
 							rows:[
-								FlightSelectorView,
+								ReportSelectorView,
 								{}
 							]
 						},
-						AllFlightsView
+						AllReportView
 					]
 				}
 			]
 		};
 	}
 	init(){
-		this.languages = this.ui(LanguagesPopup);
-		this.notifications = this.ui(NotificationsPopup);
 
-		this.on(this.app,"read:notifications",() => {
-			this.$$("bell").config.badge = 0;
-			this.$$("bell").refresh();
-
-			setTimeout(() => {
-				if (this.app){
-					this.$$("bell").config.badge += 1;
-					this.$$("bell").refresh();
-					this.app.callEvent("new:notification");
-				}
-			},10000);
-		});
 	}
 }

@@ -39,7 +39,7 @@ public class TopService {
                     accounts.parallelStream().filter(u -> u.getJid().contains((String) objects[0])).count(),
                     mc
             );
-        }).collect(Collectors.toList());
+        }).filter(topReport -> !(topReport.getGroupName().equals("ru"))).collect(Collectors.toList());
         return new PageImpl<>(collect);
     }
 
