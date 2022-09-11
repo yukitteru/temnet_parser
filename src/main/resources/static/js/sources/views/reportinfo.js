@@ -10,21 +10,27 @@ export default class ReportInfoView extends JetView {
         webix.extend(webix.ui.datatable, webix.ProgressBar)
         let startDate = "2018-01-01%2000:00:00"
         let endDate = "2022-09-09%2000:00:00"
+        let active = 0;
+        let numberOfAccounts = 0;
+        let messageCount = 0;
+        let index = 0;
         return {
             rows: [
                 {
                     id: "datatable",
                     view: "datatable",
                     localId: "datatable",
+                    math: true,
                     url: "resource->http://localhost:9090/api/v1/report/top/" + startDate + "/" + endDate,
                     select: true,
                     columns: [
                         {id: "index", header: _("#"), sort: "int", fillspace: true},
                         {
-                            id: "groupName", header: _("Группа пользователей"), sort: "string", fillspace: true, css: {
-                                "text-decoration": "underline",
-                                "color": "#000000"
-                            }
+                            id: "groupName",
+                            header: _("Группа пользователей"),
+                            sort: "string",
+                            fillspace: true,
+                            css: {"text-decoration": "underline", "color": "#000000"}
                         },
                         {id: "activeUsers", header: _("Активные"), sort: "int", fillspace: true},
                         {id: "numberOfAccounts", header: _("Уч. записей Miranda"), sort: "int", fillspace: true},
@@ -34,13 +40,24 @@ export default class ReportInfoView extends JetView {
                         "data->onStoreUpdated": function () {
                             this.data.each(function (obj, i) {
                                 obj.index = i + 1;
+                                active += obj.activeUsers;
+                                numberOfAccounts += obj.numberOfAccounts;
+                                messageCount += obj.messageCount;
+                                index = obj.index;
                             });
-
                         },
+
                         onBeforeLoad: function () {
                             this.getTopParentView().disable();
                         },
                         onAfterLoad: function () {
+                            this.add({
+                                index: index,
+                                groupName: "ВСЕГО",
+                                activeUsers: active,
+                                numberOfAccounts: numberOfAccounts,
+                                messageCount: messageCount
+                            }, index);
                             this.getTopParentView().enable();
                         },
                     },
@@ -67,6 +84,11 @@ export default class ReportInfoView extends JetView {
         grid.attachEvent("onItemClick", function (id, e, node) {
             if (id.column === "groupName") {
                 username = node.innerText;
+                let index = 0;
+                let finished = 0;
+                let inProgress = 0;
+                let rejected = 0;
+                let totalMessages = 0;
                 this.getParentView().addView({
                     id: "button",
                     view: "button",
@@ -99,9 +121,25 @@ export default class ReportInfoView extends JetView {
                         "data->onStoreUpdated": function () {
                             this.data.each(function (obj, i) {
                                 obj.index = i + 1;
+                                index = obj.index;
+                                finished += obj.finished;
+                                inProgress += obj.inProgress;
+                                rejected += obj.rejected;
+                                totalMessages += obj.totalMessages;
                             });
 
-                        }
+                        },
+                        onAfterLoad: function () {
+                            this.add({
+                                index: index,
+                                username: "ВСЕГО",
+                                finished: finished,
+                                inProgress: inProgress,
+                                rejected: rejected,
+                                totalMessages: totalMessages
+                            }, index);
+                            this.getTopParentView().enable();
+                        },
                     }
                 })
                 grid.hide();

@@ -6,9 +6,7 @@ export default class SearchDetailView extends JetView {
     config() {
         const _ = this.app.getService("locale")._;
         webix.extend(webix.ui.datatable, webix.ProgressBar);
-
         return {
-
             rows: [
                 {
                     id: "datatable",
@@ -19,7 +17,7 @@ export default class SearchDetailView extends JetView {
                         {id: "index", header: _("#"), sort: "string", fillspace: true},
                         {id: "username", header: _("Имя пользователя"), sort: "string", fillspace: true},
                         {id: "finished", header: _("Закрыто заявок"), sort: "int", fillspace: true},
-                        {id: "inProgress", header: _("Заявок взято в работу"), sort: "int", fillspace: true},
+                        {id: "inProgress", header: _("Отложено заявок"), sort: "int", fillspace: true},
                         {id: "rejected", header: _("Отклонено заявок"), sort: "int", fillspace: true},
                         {
                             id: "totalMessages",
