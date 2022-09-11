@@ -38,6 +38,10 @@ export default class ReportInfoView extends JetView {
                     ],
                     on: {
                         "data->onStoreUpdated": function () {
+                            active = 0;
+                            numberOfAccounts = 0;
+                            messageCount = 0;
+                            index = 0;
                             this.data.each(function (obj, i) {
                                 obj.index = i + 1;
                                 active += obj.activeUsers;
