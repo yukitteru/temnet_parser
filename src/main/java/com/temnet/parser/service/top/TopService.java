@@ -30,16 +30,23 @@ public class TopService {
         List<Object[]> activeUsers = reportRepository.findActiveUsers(start, end);
         List<SrUser> accounts = srUserRepository.findAll();
         List<TopReport> collect = activeUsers.parallelStream().map(objects -> {
-            String gn = (String) objects[0];
-            Long au = ((BigInteger) objects[1]).longValue();
-            Long mc = ((BigInteger) objects[2]).longValue();
-            return new TopReport(
-                    gn,
-                    au,
-                    accounts.parallelStream().filter(u -> u.getJid().contains((String) objects[0])).count(),
-                    mc
-            );
-        }).filter(topReport -> !(topReport.getGroupName().equals("ru"))).collect(Collectors.toList());
+                    String gn = (String) objects[0];
+                    Long au = ((BigInteger) objects[1]).longValue();
+                    Long mc = ((BigInteger) objects[2]).longValue();
+                    Long ft = ((BigInteger) objects[3]).longValue();
+                    Long pt = ((BigInteger) objects[4]).longValue();
+                    Long rt = ((BigInteger) objects[5]).longValue();
+                    return new TopReport(
+                            gn,
+                            au,
+                            accounts.parallelStream().filter(u -> u.getJid().contains((String) objects[0])).count(),
+                            ft,
+                            pt,
+                            rt,
+                            mc
+                    );
+                }).filter(topReport -> !(topReport.getGroupName().equals("ru"))).filter(topReport -> !(topReport.getGroupName().matches("^help.*")))
+                .collect(Collectors.toList());
         return new PageImpl<>(collect);
     }
 
