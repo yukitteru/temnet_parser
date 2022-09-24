@@ -37,6 +37,14 @@ public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecif
     @Cacheable("detailsInfo")
     List<Object[]> findDetailInfo(String groupName, Timestamp start, Timestamp end);
 
+
+    @Query(value = "SELECT username, substring_index(peer, '@', 1), txt, created_at FROM archive " +
+            "WHERE ((username = ?1 AND peer LIKE '%help%') | (username LIKE '%help%' AND peer LIKE concat('%', ?1, '%'))) " +
+            "AND created_at BETWEEN ?2 AND ?3 " +
+            "AND id % 2 = 0", nativeQuery = true)
+    @Cacheable("chatHistory")
+    List<Object[]> findChatHistory(String username, Timestamp start, Timestamp end);
+
 }
 
 

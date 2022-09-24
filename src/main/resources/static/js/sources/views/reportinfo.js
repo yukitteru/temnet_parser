@@ -3,13 +3,13 @@ import {getTopReport} from "../models/topreport";
 import {date_formatter} from "../util/dateformat";
 import {getDetailReport} from "../models/detailreport";
 
-// noinspection JSUnresolvedFunction
+// noinspection JSUnresolvedFunction,JSPotentiallyInvalidUsageOfThis,JSVoidFunctionReturnValueUsed
 export default class ReportInfoView extends JetView {
     config() {
         const _ = this.app.getService("locale")._;
         webix.extend(webix.ui.datatable, webix.ProgressBar)
-        let startDate = "2018-01-01%2000:00:00"
-        let endDate = "2022-09-09%2000:00:00"
+        let startDate = "2022-01-01%2000:00:00"
+        let endDate = "2022-12-31%2000:00:00"
         let active = 0;
         let numberOfAccounts = 0;
         let messageCount = 0;
@@ -73,19 +73,19 @@ export default class ReportInfoView extends JetView {
     }
 
     init() {
-        let grid = this.$$("datatable");
+        let _topReport = this.$$("datatable");
         let parentView = this.getParentView();
         let username;
-        let startDate = "2018-01-01%2000:00:00"
-        let endDate = "2022-09-09%2000:00:00"
+        let startDate = "2022-01-01%2000:00:00"
+        let endDate = "2022-12-31%2000:00:00"
         this.on(this.app, "search:report", (start, end) => {
             startDate = date_formatter(start);
             endDate = date_formatter(end);
-            grid.hideOverlay();
-            grid.clearAll();
-            grid.define("url", "resource->http://localhost:9090/api/v1/report/top/" + start + "/" + end);
+            _topReport.hideOverlay();
+            _topReport.clearAll();
+            _topReport.define("url", "resource->http://localhost:9090/api/v1/report/top/" + start + "/" + end);
         });
-        grid.attachEvent("onItemClick", function (id, e, node) {
+        _topReport.attachEvent("onItemClick", function (id, e, node) {
             if (id.column === "groupName") {
                 username = node.innerText;
                 let index = 0;
@@ -94,13 +94,14 @@ export default class ReportInfoView extends JetView {
                 let rejected = 0;
                 let totalMessages = 0;
                 this.getParentView().addView({
-                    id: "button",
+                    id: "back_button",
                     view: "button",
                     label: "Назад",
                     click: function () {
-                        this.getParentView().removeView("datatable2");
-                        this.getParentView().removeView("button");
-                        grid.show();
+                        let parentView1 = this.getParentView();
+                        parentView1.removeView("datatable2");
+                        parentView1.removeView("back_button");
+                        _topReport.show();
                     }
                 })
                 this.getParentView().addView({
@@ -109,7 +110,7 @@ export default class ReportInfoView extends JetView {
                     localId: "datatable2",
                     url: "resource->http://localhost:9090/api/v1/report/detail/" + username + "/" + startDate + "/" + endDate,
                     columns: [
-                        {id: "index", header: ("#"), sort: "string", fillspace: true},
+                        {id: "index", header: ("#"), sort: "int", fillspace: true},
                         {id: "username", header: ("Имя пользователя"), sort: "string", fillspace: true},
                         {id: "finished", header: ("Закрыто заявок"), sort: "int", fillspace: true},
                         {id: "inProgress", header: ("Заявок взято в работу"), sort: "int", fillspace: true},
@@ -144,13 +145,66 @@ export default class ReportInfoView extends JetView {
                             }, index);
                             this.getTopParentView().enable();
                         },
+                        onItemClick: function (id, e, node) {
+                            if (id.column === "username") {
+                                let index = 0;
+                                let user = node.innerText;
+                                let parentView1 = this.getParentView();
+                                parentView1.hide();
+                                this.getParentView().getParentView().addView({
+                                    id: "button2",
+                                    view: "button",
+                                    label: "Назад",
+                                    click: function () {
+                                        let parentView2 = this.getParentView();
+                                        parentView2.removeView("datatable3");
+                                        parentView2.removeView("button2");
+                                        parentView1.show();
+                                    }
+                                })
+                                this.getParentView().getParentView().addView({
+                                    id: "datatable3",
+                                    view: "datatable",
+                                    localId: "datatable3",
+                                    url: "resource->http://localhost:9090/api/v1/report/chat/" + user + "/" + startDate + "/" + endDate,
+                                    columns: [
+                                        {id: "index", header: ("#"), sort: "int", fillspace: true},
+                                        {id: "username", header: ("Имя пользователя"), sort: "string", fillspace: true},
+                                        {id: "peer", header: "Кому отправлено", sort: "string", fillspace: true},
+                                        {
+                                            id: "message",
+                                            header: "Сообщение",
+                                            sort: "string",
+                                            width: 180,
+                                            fillspace: true
+                                        },
+                                        {id: "createdAt", header: "Отправлено", sort: "date", fillspace: true},
+                                    ],
+                                    fixedRowHeight: false,
+                                    on: {
+                                        "data->onStoreUpdated": function () {
+                                            this.data.each(function (obj, i) {
+                                                obj.index = i + 1;
+                                                index = obj.index;
+                                            });
+
+                                        },
+                                        onresize: webix.once(function () {
+                                            this.adjustRowHeight("message", true);
+                                        }),
+                                        onAfterLoad: function () {
+                                            this.adjustRowHeight("message", true);
+                                        }
+                                    }
+                                });
+                            }
+
+                        }
                     }
                 })
-                grid.hide();
+                _topReport.hide();
             }
         });
-
-
     }
 
 }

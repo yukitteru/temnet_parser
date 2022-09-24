@@ -8,7 +8,7 @@ export default class ReportSelectorView extends JetView {
 		const theme = this.app.config.theme;
 
 		return {
-			width:400,
+			width:300,
 			multi:false,
 			margin:1,
 			css:theme,

@@ -8,7 +8,6 @@ export default class AllReportView extends JetView {
         const theme = this.app.config.theme;
 
         return {
-            gravity: 3,
             rows: [
                 {
                     view: "toolbar",

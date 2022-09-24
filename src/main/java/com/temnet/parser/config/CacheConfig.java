@@ -17,7 +17,8 @@ public class CacheConfig {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Arrays.asList(
                 new ConcurrentMapCache("activeUsers"),
-                new ConcurrentMapCache("detailsInfo")
+                new ConcurrentMapCache("detailsInfo"),
+                new ConcurrentMapCache("chatHistory")
         ));
         return cacheManager;
     }
