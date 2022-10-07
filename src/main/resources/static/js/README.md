@@ -5,7 +5,6 @@ Temnet Parser Frontend
 
 - run ```npm install```
 - run ```npm start```
-- open ```http://localhost:8080```
 
 ### Другие команды
 
