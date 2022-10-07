@@ -1,33 +1,24 @@
-Webix Booking App
+Temnet Parser Frontend
 ===================
 
-A demo for booking flights and planning vacation.
-
-### How to run
+### Как запустить
 
 - run ```npm install```
 - run ```npm start```
 - open ```http://localhost:8080```
 
-For more details, check https://www.gitbook.com/book/webix/webix-jet/details
+### Другие команды
 
-### Other commands
-
-#### Run lint
+#### Запуск линтера
 
 ```
 npm run lint
 ```
 
-#### Build production files
+#### Билд под Production
 
 ```
 npm run build
 ```
 
-After that you can copy the "codebase" folder to the production server
-
-
-### License
-
-MIT
+После чего вы можете скопировать "codebase" на свой production-сервер.
