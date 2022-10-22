@@ -6,7 +6,6 @@ export default class ReportSelectorView extends JetView {
 	config(){
 		const _ = this.app.getService("locale")._;
 		const theme = this.app.config.theme;
-
 		return {
 			width:300,
 			multi:false,

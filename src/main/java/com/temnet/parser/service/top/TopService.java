@@ -45,7 +45,8 @@ public class TopService {
                             rt,
                             mc
                     );
-                }).filter(topReport -> !(topReport.getGroupName().equals("ru"))).filter(topReport -> !(topReport.getGroupName().matches("^help.*")))
+                })
+                .filter(topReport -> !(topReport.getGroupName().equals("ru"))).filter(topReport -> !(topReport.getGroupName().matches("^help.*")))
                 .collect(Collectors.toList());
         return new PageImpl<>(collect);
     }

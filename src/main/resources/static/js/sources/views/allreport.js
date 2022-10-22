@@ -18,6 +18,14 @@ export default class AllReportView extends JetView {
                         {view: "label", label: _("")},
                         {},
                         {
+                            view: "pager",
+                            id: 'groupPager',
+                            size: 50,
+                            group: 5,
+                            template: "{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}"
+                        },
+                        {width: 6},
+                        {
                             view: "icon",
                             id: "excel",
                             icon: "mdi mdi-file-excel",
@@ -27,18 +35,21 @@ export default class AllReportView extends JetView {
                                 if(map.length > 1) {
                                     webix.toExcel(
                                         [map[0], map[1]],
-                                        {filename: "report"}
+                                        {filename: "report" + new Date().toISOString().slice(0, 10)}
                                     );
+                                }else if(map.length > 2) {
+                                    webix.toExcel((
+                                        [map[0], map[1], map[2]],
+                                            {filename: "report" + new Date().toISOString().slice(0, 10)}
+                                    ))
                                 } else {
                                     webix.toExcel(
                                         [map[0]],
-                                        {filename: "report"}
+                                        {filename: "report" + new Date().toISOString().slice(0, 10)}
                                     );
                                 }
                             }
                         },
-
-                        {width: 6}
                     ]
                 },
                 {$subview: true},

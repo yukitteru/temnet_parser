@@ -37,7 +37,7 @@ public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecif
             "left join report r3 on r3.id = r.id and match(r3.message) against ('+ЗАЯВКА +ОТЛОЖЕНА' IN BOOLEAN MODE)\n" +
             "left join report r4 on r4.id = r.id and match(r4.message) against ('+ЗАЯВКА +ОТКЛОНЕНА' IN BOOLEAN MODE)\n" +
             "where r.created_at between ?2 and ?3\n" +
-            "and r.message != ' '" +
+            "and r.message != ''" +
             "and r.groupname = ?1\n " +
             "group by r.username", nativeQuery = true)
     @Cacheable("detailsInfo")
@@ -47,6 +47,7 @@ public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecif
     @Query(value = "SELECT username, substring_index(peer, '@', 1), txt, created_at FROM archive " +
             "WHERE ((username = ?1 AND peer LIKE '%help%') | (username LIKE '%help%' AND peer LIKE concat('%', ?1, '%'))) " +
             "AND created_at BETWEEN ?2 AND ?3 " +
+            "AND txt != ' '" +
             "AND id % 2 = 0", nativeQuery = true)
     @Cacheable("chatHistory")
     List<Object[]> findChatHistory(String username, Timestamp start, Timestamp end);
