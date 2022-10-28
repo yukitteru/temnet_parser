@@ -1,20 +1,4 @@
--- --------------------------------------------------------
--- Хост:                         localhost
--- Версия сервера:               10.6.8-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
--- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-
--- Дамп структуры базы данных ejabberd
-CREATE DATABASE IF NOT EXISTS `ejabberd` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+CREATE DATABASE IF NOT EXISTS `ejabberd`
 USE `ejabberd`;
 
 -- Дамп структуры для таблица ejabberd.archive
@@ -35,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `archive` (
   KEY `i_username_bare_peer` (`username`,`bare_peer`) USING BTREE,
   KEY `i_timestamp` (`timestamp`) USING BTREE,
   FULLTEXT KEY `i_text` (`txt`)
-) ENGINE=InnoDB AUTO_INCREMENT=2091680 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2141425 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -357,7 +341,7 @@ CREATE TABLE IF NOT EXISTS `pubsub_node` (
   PRIMARY KEY (`nodeid`),
   UNIQUE KEY `i_pubsub_node_tuple` (`host`(20),`node`(120)),
   KEY `i_pubsub_node_parent` (`parent`(120))
-) ENGINE=InnoDB AUTO_INCREMENT=1541 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1604 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -393,7 +377,7 @@ CREATE TABLE IF NOT EXISTS `pubsub_state` (
   UNIQUE KEY `i_pubsub_state_tuple` (`nodeid`,`jid`(60)),
   KEY `i_pubsub_state_jid` (`jid`(60)),
   CONSTRAINT `pubsub_state_ibfk_1` FOREIGN KEY (`nodeid`) REFERENCES `pubsub_node` (`nodeid`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1576 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1640 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -417,6 +401,26 @@ CREATE TABLE IF NOT EXISTS `push_session` (
   UNIQUE KEY `i_push_usn` (`username`(191),`service`(191),`node`(191)),
   UNIQUE KEY `i_push_ut` (`username`(191),`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Экспортируемые данные не выделены.
+
+-- Дамп структуры для таблица ejabberd.report
+CREATE TABLE IF NOT EXISTS `report` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `groupname` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `i_username` (`username`),
+  KEY `i_username_created_at` (`username`,`created_at`),
+  KEY `i_created_at` (`created_at`),
+  KEY `i_groupname` (`groupname`),
+  KEY `i_groupname_username` (`groupname`,`username`) USING BTREE,
+  KEY `i_id_username` (`id`,`username`),
+  KEY `i_id_created_at` (`id`,`created_at`),
+  FULLTEXT KEY `message` (`message`)
+) ENGINE=InnoDB AUTO_INCREMENT=2162656 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -496,7 +500,7 @@ CREATE TABLE IF NOT EXISTS `spool` (
   UNIQUE KEY `seq` (`seq`),
   KEY `i_despool` (`username`) USING BTREE,
   KEY `i_spool_created_at` (`created_at`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=851 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1423 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -505,23 +509,22 @@ CREATE TABLE IF NOT EXISTS `sr_group` (
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `opts` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
 -- Дамп структуры для таблица ejabberd.sr_user
 CREATE TABLE IF NOT EXISTS `sr_user` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `jid` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `grp` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `i_sr_user_jid_group` (`jid`(75),`grp`(75)),
   KEY `i_sr_user_jid` (`jid`),
   KEY `i_sr_user_grp` (`grp`)
-) ENGINE=InnoDB AUTO_INCREMENT=2898 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2912 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
